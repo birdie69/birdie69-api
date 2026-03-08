@@ -8,7 +8,7 @@
   <ItemGroup>
     <!-- Authentication / Azure AD B2C (stub — not configured until Sprint 1) -->
     <PackageReference Include="Microsoft.Identity.Web" Version="3.8.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
 
     <!-- Logging -->
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
@@ -18,6 +18,12 @@
 
     <!-- OpenAPI / Swagger -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
+
+    <!-- EF Core Design (required for dotnet ef CLI in startup project) -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
 
     <!-- FluentValidation ASP.NET Core integration -->
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
