@@ -25,15 +25,24 @@ if (!builder.Environment.IsProduction())
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
+            // Force the legacy JwtSecurityTokenHandler so that SignatureValidator
+            // is actually called. The default JsonWebTokenHandler in .NET 8
+            // ignores SignatureValidator entirely, causing silent auth failures.
+            options.UseSecurityTokenValidators = true;
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = false,
                 ValidateAudience = false,
                 ValidateLifetime = false,
                 ValidateIssuerSigningKey = false,
+                // Accept any value from Swagger (valid JWT or plain string like "dev").
                 SignatureValidator = (token, _) =>
-                    new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler()
-                        .ReadJwtToken(token)
+                {
+                    var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                    return handler.CanReadToken(token)
+                        ? handler.ReadJwtToken(token)
+                        : new System.IdentityModel.Tokens.Jwt.JwtSecurityToken();
+                }
             };
         });
 }
@@ -61,7 +70,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "In Development: enter any value (e.g. 'dev'). In Production: enter a valid B2C JWT."
+        Description = "Development: enter any value (e.g. 'dev') or a valid JWT. Production: enter a valid Azure AD B2C JWT."
     });
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
