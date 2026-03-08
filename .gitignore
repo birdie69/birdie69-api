@@ -70,5 +70,5 @@ appsettings.Staging.json
 # Node (if frontend tooling is used at root)
 node_modules/
 
-# Docker
-.dockerignore
+# Docker artifacts (do not ignore .dockerignore — it must be committed)
+docker-compose.override.yml

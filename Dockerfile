@@ -12,8 +12,7 @@ RUN dotnet restore "src/Birdie69.Api/Birdie69.Api.csproj"
 COPY . .
 RUN dotnet publish "src/Birdie69.Api/Birdie69.Api.csproj" \
     -c Release \
-    -o /app/publish \
-    --no-restore
+    -o /app/publish
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS runtime
