@@ -32,6 +32,6 @@ public sealed class GetAnswersQueryHandler(
                 Error.Conflict("Answer.NotBothAnswered", "Answers are only visible after both partners have submitted."));
 
         var answers = await answerRepository.GetByQuestionAndCoupleAsync(request.QuestionId, couple.Id, cancellationToken);
-        return mapper.Map<IReadOnlyList<AnswerDto>>(answers);
+        return Result.Success(mapper.Map<IReadOnlyList<AnswerDto>>(answers));
     }
 }
