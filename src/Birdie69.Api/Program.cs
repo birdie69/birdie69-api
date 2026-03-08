@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,27 +24,48 @@ builder.Host.UseSerilog((ctx, cfg) =>
 // Production: full Azure AD B2C validation is enforced.
 if (!builder.Environment.IsProduction())
 {
+    // Shared dev signing key — used only to produce a parseable JWT for Swagger.
+    // Never used in Production. Value does not need to be secret.
+    var devKey = new SymmetricSecurityKey(
+        Encoding.UTF8.GetBytes("birdie69-dev-only-key-not-used-in-prod!"));
+
     builder.Services
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
-            // Force the legacy JwtSecurityTokenHandler so that SignatureValidator
-            // is actually called. The default JsonWebTokenHandler in .NET 8
-            // ignores SignatureValidator entirely, causing silent auth failures.
-            options.UseSecurityTokenValidators = true;
+            // Disable all validation — we only need the token to be parseable.
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = false,
                 ValidateAudience = false,
                 ValidateLifetime = false,
                 ValidateIssuerSigningKey = false,
-                // Accept any value from Swagger (valid JWT or plain string like "dev").
-                SignatureValidator = (token, _) =>
+                IssuerSigningKey = devKey   // required so the handler has a key reference
+            };
+
+            // Root-cause fix: JwtSecurityTokenHandler (and JsonWebTokenHandler) both
+            // throw when parsing non-JWT strings like "dev" — BEFORE SignatureValidator
+            // is ever reached. Replace any non-JWT Bearer value with a minimal
+            // self-signed dev JWT so the pipeline always gets a parseable token.
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
                 {
-                    var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
-                    return handler.CanReadToken(token)
-                        ? handler.ReadJwtToken(token)
-                        : new System.IdentityModel.Tokens.Jwt.JwtSecurityToken();
+                    var raw = context.Request.Headers.Authorization.ToString();
+                    if (raw.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var value = raw["Bearer ".Length..].Trim();
+                        var handler = new JwtSecurityTokenHandler();
+                        if (!handler.CanReadToken(value))
+                        {
+                            var devToken = new JwtSecurityToken(
+                                claims: [new Claim(ClaimTypes.NameIdentifier, "dev-user")],
+                                signingCredentials: new SigningCredentials(
+                                    devKey, SecurityAlgorithms.HmacSha256));
+                            context.Token = handler.WriteToken(devToken);
+                        }
+                    }
+                    return Task.CompletedTask;
                 }
             };
         });
