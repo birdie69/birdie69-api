@@ -19,6 +19,8 @@ public sealed class AppDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // DomainEvent is an in-memory pub/sub mechanism, not a DB entity.
+        modelBuilder.Ignore<Birdie69.Domain.Common.DomainEvent>();
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         base.OnModelCreating(modelBuilder);
     }
