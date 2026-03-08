@@ -2,6 +2,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 WORKDIR /src
 
+COPY Directory.Build.props global.json ./
 COPY ["src/Birdie69.Api/Birdie69.Api.csproj", "src/Birdie69.Api/"]
 COPY ["src/Birdie69.Application/Birdie69.Application.csproj", "src/Birdie69.Application/"]
 COPY ["src/Birdie69.Infrastructure/Birdie69.Infrastructure.csproj", "src/Birdie69.Infrastructure/"]
