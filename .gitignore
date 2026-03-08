@@ -1,0 +1,74 @@
+## .NET / C# standard gitignore
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vscode/
+
+# Rider
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+nuget.config
+
+# dotnet publish
+publish/
+
+# EF Core migrations (keep the Migrations folder but not the snapshot in CI)
+# Uncomment if you want to ignore migrations:
+# **/Migrations/
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+coverage*/
+TestResults/
+
+# Secrets — never commit these
+.env
+*.pfx
+*.p12
+*credentials*.json
+firebase-credentials.json
+appsettings.Production.json
+appsettings.Staging.json
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Node (if frontend tooling is used at root)
+node_modules/
+
+# Docker
+.dockerignore

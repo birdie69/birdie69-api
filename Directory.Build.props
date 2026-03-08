@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>12.0</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <Authors>birdie69</Authors>
+    <Company>birdie69</Company>
+    <RootNamespace>$(MSBuildProjectName.Replace("-", "_"))</RootNamespace>
+  </PropertyGroup>
+</Project>
