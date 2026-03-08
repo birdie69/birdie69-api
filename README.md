@@ -2,7 +2,7 @@
 
 > .NET 8 ASP.NET Core REST API for **birdie69** — a daily-question relationship app for couples.
 
-**Status:** Scaffold pending (Day 2)
+**Status:** ✅ Scaffold complete (Day 2 — 2026-02-14)
 
 ---
 
@@ -19,12 +19,12 @@ Clean Architecture + DDD + CQRS backend API.
 
 ## Architecture
 
-See [birdie69-docs/ARCHITECTURE_OVERVIEW.md](https://github.com/learn-claude/birdie69-docs/blob/main/ARCHITECTURE_OVERVIEW.md)
+See [birdie69-docs/ARCHITECTURE_OVERVIEW.md](https://github.com/birdie69/birdie69-docs/blob/main/ARCHITECTURE_OVERVIEW.md)
 
 ## ADRs
 
-- [ADR-003: Backend .NET 8](https://github.com/learn-claude/birdie69-docs/blob/main/adrs/ADR-003-backend-dotnet8.md)
-- [ADR-002: Auth Azure AD B2C](https://github.com/learn-claude/birdie69-docs/blob/main/adrs/ADR-002-auth-azure-ad-b2c.md)
+- [ADR-003: Backend .NET 8](https://github.com/birdie69/birdie69-docs/blob/main/adrs/ADR-003-backend-dotnet8.md)
+- [ADR-002: Auth Azure AD B2C](https://github.com/birdie69/birdie69-docs/blob/main/adrs/ADR-002-auth-azure-ad-b2c.md)
 
 ## Prerequisites
 
@@ -35,7 +35,7 @@ See [birdie69-docs/ARCHITECTURE_OVERVIEW.md](https://github.com/learn-claude/bir
 ## Development
 
 ```bash
-# Start dependencies
+# Start dependencies (PostgreSQL + Redis)
 docker compose up -d
 
 # Run API
@@ -44,6 +44,14 @@ dotnet run --project src/Birdie69.Api
 # Run tests
 dotnet test
 ```
+
+Once running, the API is accessible at:
+
+| Endpoint | URL |
+|----------|-----|
+| Swagger UI | http://localhost:5000/swagger |
+| OpenAPI JSON | http://localhost:5000/swagger/v1/swagger.json |
+| Health check | http://localhost:5000/health |
 
 ## Jira
 
