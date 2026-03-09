@@ -2,6 +2,7 @@ using Birdie69.Application;
 using Birdie69.Infrastructure;
 using Birdie69.Infrastructure.Persistence;
 using Birdie69.Api.Middleware;
+using Birdie69.Api.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
@@ -94,22 +95,10 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Development: enter any value (e.g. 'dev') or a valid JWT. Production: enter a valid Azure AD B2C JWT."
+        Description = "Development: enter any value (e.g. 'dev'). Production: paste a valid Azure AD B2C JWT."
     });
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-            {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            []
-        }
-    });
+    // Detects [Authorize] on controllers/actions and adds the Bearer lock per operation.
+    c.OperationFilter<AuthorizeOperationFilter>();
 });
 
 builder.Services.AddHttpContextAccessor();
