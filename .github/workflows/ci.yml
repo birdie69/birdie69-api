@@ -38,20 +38,14 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
-      - name: Unit tests
-        run: >
-          dotnet test
-          tests/Birdie69.Domain.Tests/Birdie69.Domain.Tests.csproj
-          tests/Birdie69.Application.Tests/Birdie69.Application.Tests.csproj
-          --no-build --configuration Release --logger "console;verbosity=normal"
+      - name: Unit tests (Domain)
+        run: dotnet test tests/Birdie69.Domain.Tests/Birdie69.Domain.Tests.csproj --no-build --configuration Release --logger "console;verbosity=normal"
+
+      - name: Unit tests (Application)
+        run: dotnet test tests/Birdie69.Application.Tests/Birdie69.Application.Tests.csproj --no-build --configuration Release --logger "console;verbosity=normal"
 
       - name: Integration tests
-        run: >
-          dotnet test
-          tests/Birdie69.Integration.Tests/Birdie69.Integration.Tests.csproj
-          --no-build --configuration Release --logger "console;verbosity=normal"
+        run: dotnet test tests/Birdie69.Integration.Tests/Birdie69.Integration.Tests.csproj --no-build --configuration Release --logger "console;verbosity=normal"
         env:
-          ConnectionStrings__DefaultConnection: >-
-            Host=localhost;Port=5432;Database=birdie69_test;
-            Username=birdie69;Password=birdie69
+          ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=birdie69_test;Username=birdie69;Password=birdie69"
           ASPNETCORE_ENVIRONMENT: Development
