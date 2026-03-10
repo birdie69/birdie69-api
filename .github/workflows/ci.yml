@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: birdie69
+          POSTGRES_PASSWORD: birdie69
+          POSTGRES_DB: birdie69_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Unit tests
+        run: >
+          dotnet test
+          tests/Birdie69.Domain.Tests/Birdie69.Domain.Tests.csproj
+          tests/Birdie69.Application.Tests/Birdie69.Application.Tests.csproj
+          --no-build --configuration Release --logger "console;verbosity=normal"
+
+      - name: Integration tests
+        run: >
+          dotnet test
+          tests/Birdie69.Integration.Tests/Birdie69.Integration.Tests.csproj
+          --no-build --configuration Release --logger "console;verbosity=normal"
+        env:
+          ConnectionStrings__DefaultConnection: >-
+            Host=localhost;Port=5432;Database=birdie69_test;
+            Username=birdie69;Password=birdie69
+          ASPNETCORE_ENVIRONMENT: Development
