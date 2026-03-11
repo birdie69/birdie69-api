@@ -25,6 +25,12 @@ public sealed class CoupleRepository(AppDbContext context)
                  (c.InitiatorId == userId || c.PartnerId == userId),
             cancellationToken);
 
+    public async Task<Couple?> GetCurrentCoupleAsync(Guid userId, CancellationToken cancellationToken = default)
+        => await DbSet.FirstOrDefaultAsync(
+            c => (c.Status == CoupleStatus.Active || c.Status == CoupleStatus.Pending) &&
+                 (c.InitiatorId == userId || c.PartnerId == userId),
+            cancellationToken);
+
     public async Task<bool> HasActiveCoupleAsync(Guid userId, CancellationToken cancellationToken = default)
         => await DbSet.AnyAsync(
             c => c.Status == CoupleStatus.Active &&

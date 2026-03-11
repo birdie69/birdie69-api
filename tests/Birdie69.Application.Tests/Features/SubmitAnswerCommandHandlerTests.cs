@@ -1,10 +1,4 @@
-using Birdie69.Application.Common.Interfaces;
 using Birdie69.Application.Features.Answers.Commands.SubmitAnswer;
-using Birdie69.Domain.Common;
-using Birdie69.Domain.Entities;
-using Birdie69.Domain.Interfaces;
-using FluentAssertions;
-using Moq;
 
 namespace Birdie69.Application.Tests.Features;
 

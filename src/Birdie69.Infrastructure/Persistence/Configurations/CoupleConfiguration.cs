@@ -26,5 +26,17 @@ public sealed class CoupleConfiguration : IEntityTypeConfiguration<Couple>
 
         builder.HasIndex(c => c.InitiatorId);
         builder.HasIndex(c => c.PartnerId);
+
+        // FK → Users: enforce referential integrity
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(c => c.InitiatorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(c => c.PartnerId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

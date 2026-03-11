@@ -21,9 +21,20 @@ public sealed class CreateCoupleCommandHandler(
         if (user is null)
             return Result.Failure<string>(Error.NotFound("User", currentUser.ExternalId));
 
-        var alreadyInCouple = await coupleRepository.HasActiveCoupleAsync(user.Id, cancellationToken);
-        if (alreadyInCouple)
-            return Result.Failure<string>(Error.Conflict("Couple.AlreadyExists", "You are already in an active couple."));
+        var existingCouple = await coupleRepository.GetCurrentCoupleAsync(user.Id, cancellationToken);
+
+        if (existingCouple is not null)
+        {
+            if (existingCouple.Status == CoupleStatus.Active)
+                return Result.Failure<string>(
+                    Error.Conflict("Couple.AlreadyExists", "You are already in an active couple."));
+
+            // Pending couple — regenerate the invite code so the old link is invalidated
+            existingCouple.RegenerateCode();
+            coupleRepository.Update(existingCouple);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            return existingCouple.InviteCode.Value;
+        }
 
         var couple = Couple.Create(Guid.NewGuid(), user.Id);
         await coupleRepository.AddAsync(couple, cancellationToken);

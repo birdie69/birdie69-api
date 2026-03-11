@@ -1,7 +1,4 @@
-using Birdie69.Application.Common.Interfaces;
 using Birdie69.Application.Features.Questions.Queries.GetTodayQuestion;
-using FluentAssertions;
-using Moq;
 
 namespace Birdie69.Application.Tests.Features;
 
