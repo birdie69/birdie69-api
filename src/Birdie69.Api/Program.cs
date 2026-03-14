@@ -60,7 +60,12 @@ if (!builder.Environment.IsProduction())
                         if (!handler.CanReadToken(value))
                         {
                             var devToken = new JwtSecurityToken(
-                                claims: [new Claim(ClaimTypes.NameIdentifier, "dev-user")],
+                                claims:
+                                [
+                                    new Claim(ClaimTypes.NameIdentifier, "dev-user-001"),
+                                    new Claim("sub", "dev-user-001"),
+                                    new Claim("name", "Dev User"),
+                                ],
                                 signingCredentials: new SigningCredentials(
                                     devKey, SecurityAlgorithms.HmacSha256));
                             context.Token = handler.WriteToken(devToken);

@@ -4,7 +4,7 @@ using Birdie69.Domain.ValueObjects;
 
 namespace Birdie69.Domain.Entities;
 
-public enum CoupleStatus { Pending, Active, Disbanded }
+public enum CoupleStatus { Pending, Active, Disbanded, Cancelled }
 
 /// <summary>
 /// Represents a relationship between two users.
@@ -55,6 +55,34 @@ public sealed class Couple : AuditableEntity
             return Result.Failure(Error.Conflict("Couple.NotActive", "Couple is not active."));
 
         Status = CoupleStatus.Disbanded;
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Generates a fresh invite code. Only valid while the couple is still Pending.
+    /// Replaces the old code so the previous one can no longer be used to join.
+    /// </summary>
+    public Result RegenerateCode()
+    {
+        if (Status != CoupleStatus.Pending)
+            return Result.Failure(Error.Conflict("Couple.NotPending", "Cannot regenerate code for a non-pending couple."));
+
+        InviteCode = InviteCode.Generate();
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Cancels a pending invite. Only the initiator may cancel before a partner joins.
+    /// </summary>
+    public Result Cancel(Guid callerId)
+    {
+        if (Status != CoupleStatus.Pending)
+            return Result.Failure(Error.Conflict("Couple.NotPending", "Only pending couples can be cancelled."));
+
+        if (InitiatorId != callerId)
+            return Result.Failure(Error.Unauthorized("Couple.NotInitiator", "Only the initiator can cancel a pending couple."));
+
+        Status = CoupleStatus.Cancelled;
         return Result.Success();
     }
 

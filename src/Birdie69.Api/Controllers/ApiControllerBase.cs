@@ -11,7 +11,18 @@ public abstract class ApiControllerBase : ControllerBase
 {
     protected IActionResult ToActionResult<T>(Result<T> result) => result.IsSuccess
         ? Ok(result.Value)
-        : result.Error.Code.EndsWith(".NotFound") ? NotFound(result.Error)
-        : result.Error.Code.StartsWith("Error.Unauthorized") ? Forbid()
-        : UnprocessableEntity(result.Error);
+        : ToErrorResult(result.Error);
+
+    protected IActionResult ToActionResult(Result result) => result.IsSuccess
+        ? NoContent()
+        : ToErrorResult(result.Error);
+
+    protected IActionResult ToErrorResult(Error error) => error.Type switch
+    {
+        ErrorType.NotFound    => NotFound(error),
+        ErrorType.Conflict    => Conflict(error),
+        ErrorType.Validation  => UnprocessableEntity(error),
+        ErrorType.Unauthorized => Forbid(),
+        _                     => UnprocessableEntity(error)
+    };
 }
