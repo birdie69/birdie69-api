@@ -22,7 +22,7 @@ public sealed class CmsService(
 
     public async Task<QuestionDto?> GetTodayQuestionAsync(DateOnly date, CancellationToken ct = default)
     {
-        var cacheKey = $"question:today:{date:yyyy-MM-dd}";
+        var cacheKey = $"cms:question:{date:yyyy-MM-dd}";
 
         var cached = await cache.GetStringAsync(cacheKey, ct);
         if (cached is not null)
@@ -58,6 +58,7 @@ public sealed class CmsService(
         }
 
         var dto = new QuestionDto(
+            Id: Guid.Empty,
             DocumentId: item.DocumentId,
             Title: item.Title,
             Body: item.Body,

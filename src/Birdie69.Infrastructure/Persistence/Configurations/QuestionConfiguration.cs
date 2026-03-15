@@ -11,16 +11,24 @@ public sealed class QuestionConfiguration : IEntityTypeConfiguration<Question>
     {
         builder.HasKey(q => q.Id);
 
-        builder.Property(q => q.ExternalId)
+        builder.Property(q => q.ExternalDocumentId)
             .IsRequired()
             .HasMaxLength(128);
 
-        builder.HasIndex(q => q.ExternalId).IsUnique();
+        builder.HasIndex(q => q.ExternalDocumentId).IsUnique();
         builder.HasIndex(q => q.ScheduledDate).IsUnique();
 
-        builder.Property(q => q.Text)
+        builder.Property(q => q.Title)
+            .IsRequired()
+            .HasMaxLength(500);
+
+        builder.Property(q => q.Body)
             .IsRequired()
             .HasMaxLength(2000);
+
+        builder.Property(q => q.Category)
+            .IsRequired()
+            .HasMaxLength(100);
 
         builder.Property(q => q.Tags)
             .HasConversion(
@@ -31,5 +39,8 @@ public sealed class QuestionConfiguration : IEntityTypeConfiguration<Question>
                 (a, b) => a != null && b != null && a.SequenceEqual(b),
                 v => v.Aggregate(0, (h, s) => HashCode.Combine(h, s.GetHashCode())),
                 v => v.ToList()));
+
+        builder.Property(q => q.ScheduledDate)
+            .HasColumnType("date");
     }
 }

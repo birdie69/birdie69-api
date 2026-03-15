@@ -9,20 +9,27 @@ public sealed class AnswersController(ISender sender) : ApiControllerBase
 {
     /// <summary>Submit an answer to a question.</summary>
     [HttpPost]
-    [ProducesResponseType<Guid>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType<Guid>(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Submit(
         [FromBody] SubmitAnswerCommand command,
         CancellationToken cancellationToken)
-        => ToActionResult(await sender.Send(command, cancellationToken));
+    {
+        var result = await sender.Send(command, cancellationToken);
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetAnswers), new { questionId = command.QuestionId }, new { id = result.Value })
+            : ToErrorResult(result.Error);
+    }
 
     /// <summary>
-    /// Get both partners' answers for a question.
-    /// Only available after both have submitted.
+    /// Get the reveal state for both partners' answers on a question.
+    /// Always returns 200 — IsRevealed is true only when both have submitted.
     /// </summary>
     [HttpGet("{questionId:guid}")]
-    [ProducesResponseType<IReadOnlyList<AnswerDto>>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType<AnswerRevealDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAnswers(
         Guid questionId,
         CancellationToken cancellationToken)

@@ -10,6 +10,9 @@ public sealed class QuestionRepository(AppDbContext context)
     public async Task<Question?> GetByScheduledDateAsync(DateOnly date, CancellationToken cancellationToken = default)
         => await DbSet.FirstOrDefaultAsync(q => q.ScheduledDate == date, cancellationToken);
 
+    public async Task<Question?> GetByExternalIdAsync(string externalDocumentId, CancellationToken cancellationToken = default)
+        => await DbSet.FirstOrDefaultAsync(q => q.ExternalDocumentId == externalDocumentId, cancellationToken);
+
     public async Task<Question?> GetTodayAsync(CancellationToken cancellationToken = default)
         => await GetByScheduledDateAsync(DateOnly.FromDateTime(DateTime.UtcNow), cancellationToken);
 }
