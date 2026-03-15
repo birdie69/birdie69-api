@@ -40,9 +40,10 @@ public static class DependencyInjection
             var config = sp.GetRequiredService<IConfiguration>();
             var baseUrl = config["Strapi:BaseUrl"] ?? "http://localhost:1337";
             client.BaseAddress = new Uri(baseUrl);
-            client.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue(
-                    "Bearer", config["Strapi:ReadToken"] ?? string.Empty);
+            var token = config["Strapi:ReadToken"];
+            if (!string.IsNullOrEmpty(token))
+                client.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
         });
 
         return services;
