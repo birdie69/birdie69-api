@@ -7,6 +7,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- AutoMapper 13.0.1 GHSA-rvv3-g6hj-g44x — suppressed until upgraded -->
     <NuGetAuditSuppress>https://github.com/advisories/GHSA-rvv3-g6hj-g44x</NuGetAuditSuppress>
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
     <AnalysisLevel>latest</AnalysisLevel>
     <Authors>birdie69</Authors>
     <Company>birdie69</Company>
