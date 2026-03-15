@@ -14,7 +14,7 @@ public sealed class UsersEndpointTests(WebAppFactory factory)
     private HttpClient AuthClient()
     {
         var client = factory.CreateClient();
-        // Any non-JWT value is replaced by the dev self-signed token (sub="dev-user-001")
+        // Any non-JWT value is replaced by a dev self-signed token whose sub equals the bearer value itself
         client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", "dev-test-token");
         return client;
