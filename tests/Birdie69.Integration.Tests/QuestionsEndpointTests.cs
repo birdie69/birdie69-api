@@ -1,5 +1,7 @@
 using Birdie69.Application.Features.Questions.Queries.GetTodayQuestion;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System.Net;
 using System.Net.Http.Headers;
@@ -27,6 +29,11 @@ public sealed class QuestionsEndpointTests(WebAppFactory factory)
         factory.CmsServiceMock
             .Setup(x => x.GetTodayQuestionAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((QuestionDto?)null);
+
+        // Clear the handler-level Redis cache so the handler doesn't return a previously cached question.
+        using var scope = factory.Services.CreateScope();
+        var cache = scope.ServiceProvider.GetRequiredService<IDistributedCache>();
+        await cache.RemoveAsync($"question:today:{DateTime.UtcNow:yyyy-MM-dd}");
 
         var client = factory.CreateClient();
         client.DefaultRequestHeaders.Authorization =
