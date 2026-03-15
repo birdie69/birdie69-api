@@ -62,9 +62,9 @@ if (!builder.Environment.IsProduction())
                             var devToken = new JwtSecurityToken(
                                 claims:
                                 [
-                                    new Claim(ClaimTypes.NameIdentifier, "dev-user-001"),
-                                    new Claim("sub", "dev-user-001"),
-                                    new Claim("name", "Dev User"),
+                                    new Claim(ClaimTypes.NameIdentifier, value),
+                                    new Claim("sub", value),
+                                    new Claim("name", value),
                                 ],
                                 signingCredentials: new SigningCredentials(
                                     devKey, SecurityAlgorithms.HmacSha256));
