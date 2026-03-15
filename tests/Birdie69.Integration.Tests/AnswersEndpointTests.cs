@@ -61,7 +61,7 @@ public sealed class AnswersEndpointTests(WebAppFactory factory)
                 DocumentId: docId,
                 Title: $"Question for run {runId}",
                 Body: "Test body.",
-                Category: "test",
+                Category: "fun",
                 ScheduledDate: DateOnly.FromDateTime(DateTime.UtcNow),
                 Tags: []));
 

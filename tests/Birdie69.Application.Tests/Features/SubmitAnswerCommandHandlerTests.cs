@@ -39,7 +39,7 @@ public sealed class SubmitAnswerCommandHandlerTests
         var couple = Couple.Create(Guid.NewGuid(), userId);
         couple.AcceptInvite(Guid.NewGuid());
         couple.ClearDomainEvents();
-        var question = Question.Create(questionId, "ext-q1", "Question?", "Body text.", "general", DateOnly.FromDateTime(DateTime.UtcNow));
+        var question = Question.Create(questionId, "ext-q1", "Question?", "Body text.", "fun", DateOnly.FromDateTime(DateTime.UtcNow));
         var existingAnswer = Answer.Submit(Guid.NewGuid(), userId, questionId, couple.Id, "Previous");
         existingAnswer.ClearDomainEvents();
 
