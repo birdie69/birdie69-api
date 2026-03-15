@@ -43,6 +43,7 @@ public sealed class QuestionsEndpointTests(WebAppFactory factory)
         factory.CmsServiceMock
             .Setup(x => x.GetTodayQuestionAsync(It.IsAny<DateOnly>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new QuestionDto(
+                Id: Guid.Empty,
                 DocumentId: "doc-abc",
                 Title: "Integration test question",
                 Body: "Body text for integration test.",
@@ -59,5 +60,6 @@ public sealed class QuestionsEndpointTests(WebAppFactory factory)
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadAsStringAsync();
         body.Should().Contain("Integration test question");
+        body.Should().MatchRegex("\"id\"\\s*:\\s*\"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\"");
     }
 }
