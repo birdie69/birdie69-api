@@ -83,12 +83,34 @@ else
         .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAdB2C"));
 }
 
+// ── CORS ──────────────────────────────────────────────────────────────────────
+// In development, allow the Next.js dev server and any local origin.
+// In production, restrict to the deployed frontend URL via configuration.
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>()
+    ?? ["http://localhost:3000", "http://localhost:3001"];
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // ── Application + Infrastructure layers ──────────────────────────────────────
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // ── API services ──────────────────────────────────────────────────────────────
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+        opts.JsonSerializerOptions.Converters.Add(
+            new System.Text.Json.Serialization.JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -122,6 +144,7 @@ if (!app.Environment.IsProduction())
 
 // ── Middleware pipeline ───────────────────────────────────────────────────────
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {
