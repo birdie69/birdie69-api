@@ -1,4 +1,5 @@
 using Birdie69.Application.Common.Interfaces;
+using Birdie69.Application.Features.Users.Commands.SetNotificationToken;
 using Birdie69.Application.Features.Users.Commands.UpsertUser;
 using Birdie69.Application.Features.Users.Queries.GetProfile;
 using MediatR;
@@ -39,4 +40,22 @@ public sealed class UsersController(ISender sender, ICurrentUser currentUser) : 
 
         return Ok(new { id = result.Value });
     }
+
+    /// <summary>Register or update the caller's FCM device token.</summary>
+    [HttpPut("me/notification-token")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> SetNotificationToken(
+        [FromBody] SetNotificationTokenRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new SetNotificationTokenCommand(request.Token), cancellationToken);
+        if (result.IsFailure)
+            return ToErrorResult(result.Error);
+
+        return Ok();
+    }
 }
+
+/// <summary>Request body for PUT /v1/users/me/notification-token</summary>
+public sealed record SetNotificationTokenRequest(string Token);
