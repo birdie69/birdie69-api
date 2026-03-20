@@ -26,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<ICoupleRepository, CoupleRepository>();
         services.AddScoped<IAnswerRepository, AnswerRepository>();
         services.AddScoped<IQuestionRepository, QuestionRepository>();
+        services.AddScoped<IStreakRepository, StreakRepository>();
 
         // ── Distributed cache (Redis → memory fallback for local dev) ─────────
         var redisConnStr = configuration["Redis:ConnectionString"];
