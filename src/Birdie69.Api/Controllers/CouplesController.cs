@@ -1,6 +1,7 @@
 using Birdie69.Application.Features.Couples.Commands.CreateCouple;
 using Birdie69.Application.Features.Couples.Commands.JoinCouple;
 using Birdie69.Application.Features.Couples.Commands.LeaveCouple;
+using Birdie69.Application.Features.Couples.Commands.SetNotificationTime;
 using Birdie69.Application.Features.Couples.Queries.GetCouple;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -62,4 +63,23 @@ public sealed class CouplesController(ISender sender) : ApiControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Leave(CancellationToken cancellationToken)
         => ToActionResult(await sender.Send(new LeaveCoupleCommand(), cancellationToken));
+
+    /// <summary>Set the daily notification time for the caller's couple.</summary>
+    [HttpPut("me/notification-time")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SetNotificationTime(
+        [FromBody] SetNotificationTimeRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(new SetNotificationTimeCommand(request.NotificationTime), cancellationToken);
+        if (result.IsFailure)
+            return ToErrorResult(result.Error);
+
+        return Ok(new { notificationTime = result.Value });
+    }
 }
+
+/// <summary>Request body for PUT /v1/couples/me/notification-time</summary>
+public sealed record SetNotificationTimeRequest(string NotificationTime);
