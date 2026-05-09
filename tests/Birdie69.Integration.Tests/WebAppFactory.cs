@@ -60,7 +60,9 @@ public sealed class WebAppFactory : WebApplicationFactory<Program>, IAsyncLifeti
             services.AddScoped<ICmsService>(_ => CmsServiceMock.Object);
         });
 
-        builder.UseEnvironment("Testing");
+        // Development environment ensures the IsDevelopment() dev-JWT bypass is active,
+        // allowing plain Bearer strings (e.g. "dev-test-token") used in some tests.
+        builder.UseEnvironment("Development");
     }
 
     public new async Task DisposeAsync()
