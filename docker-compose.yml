@@ -36,6 +36,8 @@ services:
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=birdie69;Username=birdie69;Password=birdie69_dev
       - Redis__ConnectionString=redis:6379
       - Strapi__BaseUrl=${STRAPI_BASE_URL:-http://host.docker.internal:1337}
+      # STRAPI_READ_TOKEN: set via .env for local dev (empty = Strapi Public role)
+      # In staging/prod: injected from Azure Key Vault reference on Container App env var
       - Strapi__ReadToken=${STRAPI_READ_TOKEN:-}
     depends_on:
       db:
