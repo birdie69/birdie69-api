@@ -48,32 +48,36 @@ if (!builder.Environment.IsProduction())
             // throw when parsing non-JWT strings like "dev" — BEFORE SignatureValidator
             // is ever reached. Replace any non-JWT Bearer value with a minimal
             // self-signed dev JWT so the pipeline always gets a parseable token.
-            options.Events = new JwtBearerEvents
+            // Guard: only active in Development — Staging/Production receive 401 for non-JWT strings.
+            if (builder.Environment.IsDevelopment())
             {
-                OnMessageReceived = context =>
+                options.Events = new JwtBearerEvents
                 {
-                    var raw = context.Request.Headers.Authorization.ToString();
-                    if (raw.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                    OnMessageReceived = context =>
                     {
-                        var value = raw["Bearer ".Length..].Trim();
-                        var handler = new JwtSecurityTokenHandler();
-                        if (!handler.CanReadToken(value))
+                        var raw = context.Request.Headers.Authorization.ToString();
+                        if (raw.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                         {
-                            var devToken = new JwtSecurityToken(
-                                claims:
-                                [
-                                    new Claim(ClaimTypes.NameIdentifier, value),
-                                    new Claim("sub", value),
-                                    new Claim("name", value),
-                                ],
-                                signingCredentials: new SigningCredentials(
-                                    devKey, SecurityAlgorithms.HmacSha256));
-                            context.Token = handler.WriteToken(devToken);
+                            var value = raw["Bearer ".Length..].Trim();
+                            var handler = new JwtSecurityTokenHandler();
+                            if (!handler.CanReadToken(value))
+                            {
+                                var devToken = new JwtSecurityToken(
+                                    claims:
+                                    [
+                                        new Claim(ClaimTypes.NameIdentifier, value),
+                                        new Claim("sub", value),
+                                        new Claim("name", value),
+                                    ],
+                                    signingCredentials: new SigningCredentials(
+                                        devKey, SecurityAlgorithms.HmacSha256));
+                                context.Token = handler.WriteToken(devToken);
+                            }
                         }
+                        return Task.CompletedTask;
                     }
-                    return Task.CompletedTask;
-                }
-            };
+                };
+            }
         });
 }
 else
